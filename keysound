@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+SCRIPT_DIR=$(CDPATH= cd "$(dirname "$0")" && pwd)
+cd "$SCRIPT_DIR"
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${PATH}"
+if [ -z "${TERMINFO:-}" ] && [ -d /usr/share/terminfo ]; then
+	export TERMINFO=/usr/share/terminfo
+fi
+if [ -x /usr/bin/python3 ]; then
+	exec /usr/bin/python3 "$SCRIPT_DIR/keysound.py" "$@"
+fi
+exec python3 "$SCRIPT_DIR/keysound.py" "$@"
