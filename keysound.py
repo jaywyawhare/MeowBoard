@@ -26,29 +26,13 @@ _ASSET_VOICES = os.path.join(
 _MEOW_WAV = "meow.wav"
 
 
-def _downloads_dir() -> str:
-    xdg = os.environ.get("XDG_DOWNLOAD_DIR", "").strip()
-    if xdg and os.path.isdir(xdg):
-        return os.path.normpath(xdg)
-    return os.path.normpath(os.path.expanduser("~/Downloads"))
-
-
-def resolve_sound_path() -> str:
-    """
-    Prefer ``Downloads/meow.wav`` (or ``$XDG_DOWNLOAD_DIR/meow.wav``) if present,
-    else the bundled ``assets/voices/meow.wav``.
-    """
-    dl = os.path.join(_downloads_dir(), _MEOW_WAV)
-    if os.path.isfile(dl):
-        return os.path.normpath(dl)
-    bundled = os.path.normpath(os.path.join(_ASSET_VOICES, _MEOW_WAV))
-    if os.path.isfile(bundled):
-        return bundled
-    print(
-        f"missing sound file: add {_MEOW_WAV} under Downloads or {bundled}",
-        file=sys.stderr,
-    )
-    sys.exit(2)
+def bundled_sound_path() -> str:
+    """Return absolute path to ``assets/voices/meow.wav`` next to this script."""
+    path = os.path.normpath(os.path.join(_ASSET_VOICES, _MEOW_WAV))
+    if not os.path.isfile(path):
+        print(f"missing sound file: {path}", file=sys.stderr)
+        sys.exit(2)
+    return path
 
 
 _play_warned = False
@@ -1005,7 +989,7 @@ def main() -> None:
         print("--min-interval must be >= 0", file=sys.stderr)
         sys.exit(2)
 
-    sound_path = resolve_sound_path()
+    sound_path = bundled_sound_path()
     if args.test_sound:
         sys.exit(test_linux_audio(sound_path))
 
